@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-white antialiased;
+    background-image: theme("backgroundImage.hero-gradient");
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .dashboard-card {
+    @apply rounded-2xl border border-white/[0.06] bg-surface/80 shadow-card backdrop-blur-sm transition-all duration-200;
+  }
+
+  .dashboard-card:hover {
+    @apply border-white/10 bg-surface-elevated/90;
+  }
+
+  .stat-block {
+    @apply rounded-xl border border-white/[0.06] bg-surface-elevated/60 p-4 transition-colors duration-200;
+  }
+
+  .section-accent {
+    @apply h-5 w-1 rounded-full bg-gradient-to-b from-primary to-gold;
+  }
+
+  .filter-pill {
+    @apply cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-all duration-200;
+  }
+
+  .filter-pill-active {
+    @apply bg-primary text-white shadow-[0_0_16px_rgba(220,38,38,0.35)];
+  }
+
+  .filter-pill-inactive {
+    @apply border border-white/[0.08] bg-surface/60 text-white/50 hover:border-white/15 hover:text-white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
