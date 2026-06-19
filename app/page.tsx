@@ -1,13 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import HeroSection from "@/components/hero/HeroSection";
 import CacheBanner from "@/components/CacheBanner";
-import DashboardStats from "@/components/DashboardStats";
 import ErrorBanner from "@/components/ErrorBanner";
 import MatchCard from "@/components/MatchCard";
-import PageHeader from "@/components/PageHeader";
 import SectionHeader from "@/components/SectionHeader";
-import { SkeletonMatchCard, SkeletonStats } from "@/components/SkeletonCard";
+import { SkeletonMatchCard } from "@/components/SkeletonCard";
 import {
   fetchAllMatches,
   isLiveStatus,
@@ -67,121 +66,87 @@ export default function HomePage() {
   }, [loadMatches]);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Match Center"
-        subtitle="Live scores and updates - refreshes every 60s"
-        badge="FIFA World Cup"
-      />
-
-      {loading ? (
-        <SkeletonStats />
-      ) : (
-        <DashboardStats
-          liveCount={liveMatches.length}
-          todayCount={todayMatches.length}
-          upcomingCount={upcomingMatches.length}
-        />
-      )}
+    <div className="space-y-10">
+      <HeroSection />
 
       {fromCache && lastUpdated && (
         <CacheBanner lastUpdated={lastUpdated} error={error} />
       )}
-
       {!loading && error && !fromCache && <ErrorBanner message={error} />}
 
       <section>
-        <SectionHeader
-          title="Live Now"
-          subtitle="Matches in progress"
-          count={liveMatches.length}
-          accent="red"
-        />
-        {loading ? (
-          <div className="space-y-3">
+          <SectionHeader
+            title="Live Now"
+            subtitle="Matches in progress"
+            count={liveMatches.length}
+            accent="live"
+          />
+          {loading ? (
             <SkeletonMatchCard />
-          </div>
-        ) : liveMatches.length > 0 ? (
-          <div className="space-y-3">
-            {liveMatches.map((match) => (
-              <MatchCard key={match.id} match={match} variant="featured" />
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-card px-4 py-10 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.08] bg-surface-elevated">
-              <svg
-                className="h-6 w-6 text-white/20"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728"
-                />
-              </svg>
+          ) : liveMatches.length > 0 ? (
+            <div className="space-y-4">
+              {liveMatches.map((match) => (
+                <MatchCard key={match.id} match={match} />
+              ))}
             </div>
-            <p className="text-sm font-medium text-white/40">
-              No matches live right now
-            </p>
-            <p className="mt-1 text-xs text-white/25">
-              Check back during match windows
-            </p>
-          </div>
-        )}
-      </section>
+          ) : (
+            <div className="jumbotron-panel px-6 py-12 text-center">
+              <p className="font-display text-2xl text-goal-net/40">
+                No matches live right now
+              </p>
+            </div>
+          )}
+        </section>
 
-      <section>
-        <SectionHeader
-          title="Today"
-          subtitle="Scheduled for today"
-          count={todayMatches.length}
-          accent="neutral"
-        />
-        {loading ? (
-          <SkeletonMatchCard />
-        ) : todayMatches.length > 0 ? (
-          <div className="space-y-3">
-            {todayMatches.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-card px-4 py-8 text-center">
-            <p className="text-sm text-white/40">No matches scheduled today</p>
-          </div>
-        )}
-      </section>
-
-      <section>
-        <SectionHeader
-          title="Upcoming"
-          subtitle="Next 5 fixtures"
-          count={upcomingMatches.length}
-          accent="gold"
-        />
-        {loading ? (
-          <div className="space-y-3">
+        <section>
+          <SectionHeader
+            title="Today"
+            count={todayMatches.length}
+            accent="neutral"
+          />
+          {loading ? (
             <SkeletonMatchCard />
-            <SkeletonMatchCard />
-          </div>
-        ) : upcomingMatches.length > 0 ? (
-          <div className="space-y-3">
-            {upcomingMatches.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-card px-4 py-8 text-center">
-            <p className="text-sm text-white/40">No upcoming matches</p>
-          </div>
-        )}
-      </section>
+          ) : todayMatches.length > 0 ? (
+            <div className="space-y-4">
+              {todayMatches.map((match) => (
+                <MatchCard key={match.id} match={match} />
+              ))}
+            </div>
+          ) : (
+            <div className="jumbotron-panel px-6 py-10 text-center">
+              <p className="font-mono text-xs uppercase tracking-widest text-goal-net/35">
+                No matches scheduled today
+              </p>
+            </div>
+          )}
+        </section>
 
+        <section>
+          <SectionHeader
+            title="Upcoming"
+            subtitle="Next 5 fixtures"
+            count={upcomingMatches.length}
+            accent="gold"
+          />
+          {loading ? (
+            <div className="space-y-4">
+              <SkeletonMatchCard />
+              <SkeletonMatchCard />
+            </div>
+          ) : upcomingMatches.length > 0 ? (
+            <div className="space-y-4">
+              {upcomingMatches.map((match) => (
+                <MatchCard key={match.id} match={match} />
+              ))}
+            </div>
+          ) : (
+            <div className="jumbotron-panel px-6 py-10 text-center">
+              <p className="font-mono text-xs uppercase tracking-widest text-goal-net/35">
+                No upcoming matches
+              </p>
+            </div>
+          )}
+        </section>
     </div>
   );
 }

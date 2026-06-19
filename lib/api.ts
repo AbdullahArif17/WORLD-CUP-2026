@@ -108,6 +108,7 @@ export function isUpcomingStatus(status: string): boolean {
 
 export function formatGroupLabel(group: string | null): string {
   if (!group) return "";
+  if (group.startsWith("Group ")) return group;
   const letter = group.replace("GROUP_", "");
   return `Group ${letter}`;
 }

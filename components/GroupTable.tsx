@@ -1,107 +1,123 @@
+"use client";
+
+import { motion } from "framer-motion";
 import type { GroupStanding } from "@/lib/types";
-import { formatGroupLabel, getTeamFlag } from "@/lib/api";
+import { formatGroupLabel } from "@/lib/api";
+import TeamFlag from "@/components/ui/TeamFlag";
 
 interface GroupTableProps {
   group: GroupStanding;
+  index?: number;
 }
 
-export default function GroupTable({ group }: GroupTableProps) {
+const rowVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.05, duration: 0.3 },
+  }),
+};
+
+export default function GroupTable({ group, index = 0 }: GroupTableProps) {
   return (
-    <div className="dashboard-card overflow-hidden">
-      <div className="flex items-center justify-between border-b border-white/[0.06] bg-surface-elevated/50 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="section-accent" aria-hidden="true" />
-          <h3 className="font-mono text-sm font-bold uppercase tracking-wide text-white">
-            {formatGroupLabel(group.group)}
-          </h3>
-        </div>
-        <span className="rounded-full border border-gold/20 bg-gold/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-gold">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="jumbotron-panel"
+    >
+      <div className="flex items-center justify-between border-b border-turf-green/20 px-5 py-4">
+        <h3 className="font-display text-2xl tracking-wide text-floodlight">
+          {formatGroupLabel(group.group)}
+        </h3>
+        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-card-gold/70">
           Top 2 advance
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[320px] text-left text-xs">
+        <table className="w-full min-w-[340px]">
           <thead>
-            <tr className="border-b border-white/[0.05] font-mono text-[10px] uppercase tracking-wider text-white/30">
-              <th className="px-4 py-2.5 font-semibold">#</th>
-              <th className="px-2 py-2.5 font-semibold">Team</th>
-              <th className="px-2 py-2.5 text-center font-semibold">P</th>
-              <th className="px-2 py-2.5 text-center font-semibold">W</th>
-              <th className="px-2 py-2.5 text-center font-semibold">D</th>
-              <th className="px-2 py-2.5 text-center font-semibold">L</th>
-              <th className="px-2 py-2.5 text-center font-semibold">GD</th>
-              <th className="px-4 py-2.5 text-center font-semibold">Pts</th>
+            <tr className="border-b border-turf-green/15 font-mono text-[9px] uppercase tracking-[0.2em] text-goal-net/35">
+              <th className="px-5 py-3 text-left">#</th>
+              <th className="px-2 py-3 text-left">Team</th>
+              <th className="px-2 py-3 text-center">P</th>
+              <th className="px-2 py-3 text-center">W</th>
+              <th className="px-2 py-3 text-center">D</th>
+              <th className="px-2 py-3 text-center">L</th>
+              <th className="px-2 py-3 text-center">GD</th>
+              <th className="px-5 py-3 text-center">Pts</th>
             </tr>
           </thead>
           <tbody>
-            {group.table.map((row) => {
+            {group.table.map((row, i) => {
               const advances = row.position <= 2;
               return (
-                <tr
+                <motion.tr
                   key={row.team.id}
-                  className={`border-b border-white/[0.04] last:border-0 transition-colors duration-150 ${
-                    advances
-                      ? "bg-gold/[0.06] hover:bg-gold/[0.09]"
-                      : "hover:bg-white/[0.02]"
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={rowVariants}
+                  className={`border-b border-turf-green/10 last:border-0 ${
+                    advances ? "border-l-2 border-l-card-gold bg-card-gold/[0.04]" : ""
                   }`}
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-3.5">
                     <span
-                      className={`font-mono text-xs font-bold tabular-nums ${
-                        advances ? "text-gold" : "text-white/30"
+                      className={`font-display text-lg tabular-nums ${
+                        advances ? "text-card-gold" : "text-goal-net/30"
                       }`}
                     >
                       {row.position}
                     </span>
                   </td>
-                  <td className="px-2 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base leading-none" aria-hidden="true">
-                        {getTeamFlag(row.team.tla)}
-                      </span>
+                  <td className="px-2 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <TeamFlag tla={row.team.tla} size="sm" />
                       <span
-                        className={`truncate font-semibold ${
-                          advances ? "text-gold" : "text-white/85"
+                        className={`font-display text-base tracking-wide ${
+                          advances ? "text-card-gold" : "text-floodlight"
                         }`}
                       >
                         {row.team.shortName || row.team.name}
                       </span>
                     </div>
                   </td>
-                  <td className="px-2 py-3 text-center font-mono tabular-nums text-white/55">
+                  <td className="px-2 py-3.5 text-center font-mono text-sm tabular-nums text-goal-net/55">
                     {row.playedGames}
                   </td>
-                  <td className="px-2 py-3 text-center font-mono tabular-nums text-white/55">
+                  <td className="px-2 py-3.5 text-center font-mono text-sm tabular-nums text-goal-net/55">
                     {row.won}
                   </td>
-                  <td className="px-2 py-3 text-center font-mono tabular-nums text-white/55">
+                  <td className="px-2 py-3.5 text-center font-mono text-sm tabular-nums text-goal-net/55">
                     {row.draw}
                   </td>
-                  <td className="px-2 py-3 text-center font-mono tabular-nums text-white/55">
+                  <td className="px-2 py-3.5 text-center font-mono text-sm tabular-nums text-goal-net/55">
                     {row.lost}
                   </td>
-                  <td className="px-2 py-3 text-center font-mono tabular-nums text-white/55">
+                  <td className="px-2 py-3.5 text-center font-mono text-sm tabular-nums text-goal-net/55">
                     {row.goalDifference > 0
                       ? `+${row.goalDifference}`
                       : row.goalDifference}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-5 py-3.5 text-center">
                     <span
-                      className={`inline-flex min-w-[28px] justify-center rounded-md px-1.5 py-0.5 font-mono text-sm font-bold tabular-nums ${
-                        advances
-                          ? "bg-gold/15 text-gold"
-                          : "text-white"
+                      className={`inline-flex min-w-[32px] justify-center font-display text-xl tabular-nums ${
+                        advances ? "text-card-gold" : "text-floodlight"
                       }`}
                     >
                       {row.points}
                     </span>
                   </td>
-                </tr>
+                </motion.tr>
               );
             })}
           </tbody>
         </table>
       </div>
-    </div>
+    </motion.div>
   );
 }

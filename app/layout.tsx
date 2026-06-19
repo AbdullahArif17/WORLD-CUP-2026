@@ -1,11 +1,26 @@
 import type { Metadata } from "next";
+import { Bebas_Neue, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
+import CustomCursor from "@/components/ui/CustomCursor";
 import "./globals.css";
 
+const bebas = Bebas_Neue({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "WC 2026 Live Tracker",
+  title: "World Cup 2026 | Live Tracker",
   description:
-    "Live scores, fixtures, and group standings for FIFA World Cup 2026",
+    "Elite live scores, fixtures, and group standings for FIFA World Cup 2026",
 };
 
 export default function RootLayout({
@@ -15,16 +30,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans">
-        <div className="flex min-h-screen flex-col">
+      <body className={`${bebas.variable} ${inter.variable} font-sans`}>
+        <CustomCursor />
+        <div className="flex min-h-screen flex-col overflow-x-hidden">
           <Navbar />
-          <main className="mx-auto w-full max-w-[640px] flex-1 px-4 py-5">
+          <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
             {children}
           </main>
-          <footer className="border-t border-white/[0.06] py-5 text-center">
-            <p className="text-xs text-white/25">Built by DELL</p>
-            <p className="mt-0.5 font-mono text-[10px] text-white/15">
-              FIFA World Cup 2026 | USA | CAN | MEX
+          <footer className="border-t border-goal-net/10 py-6 text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-goal-net/25">
+              Built by DELL · FIFA World Cup 2026
             </p>
           </footer>
         </div>

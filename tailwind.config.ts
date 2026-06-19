@@ -9,32 +9,43 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#070b14",
-        surface: "#0f1629",
-        "surface-elevated": "#141e33",
-        pitch: "#0a1020",
-        primary: "#DC2626",
-        "primary-dark": "#991b1b",
-        gold: "#FBBF24",
-        "gold-dark": "#d97706",
+        "pitch-black": "#0A0E0A",
+        floodlight: "#F8FFF4",
+        "turf-green": "#1B5E3F",
+        "goal-net": "#ECF5E8",
+        "card-gold": "#D4AF37",
+        "live-red": "#E63946",
       },
       fontFamily: {
-        sans: ["Inter", "Segoe UI", "system-ui", "sans-serif"],
-        mono: ["Cascadia Code", "Consolas", "monospace"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-bebas)", "Impact", "sans-serif"],
       },
       boxShadow: {
-        live: "0 0 24px rgba(220, 38, 38, 0.25), inset 0 1px 0 rgba(220, 38, 38, 0.1)",
-        card: "0 4px 24px rgba(0, 0, 0, 0.4)",
-        gold: "0 0 20px rgba(251, 191, 36, 0.15)",
+        turf: "0 8px 32px rgba(27, 94, 63, 0.35)",
+        live: "0 0 28px rgba(230, 57, 70, 0.4)",
+        bloom: "0 0 40px rgba(248, 255, 244, 0.08)",
       },
       backgroundImage: {
-        "pitch-grid":
-          "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
-        "hero-gradient":
-          "radial-gradient(ellipse 80% 60% at 50% -20%, rgba(220,38,38,0.18), transparent), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(251,191,36,0.08), transparent)",
+        "pitch-lines":
+          "linear-gradient(rgba(236,245,232,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(236,245,232,0.04) 1px, transparent 1px)",
+        "floodlight-radial":
+          "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(248,255,244,0.12) 0%, transparent 70%)",
+        "pitch-texture":
+          "linear-gradient(135deg, rgba(27,94,63,0.05) 0%, transparent 50%), linear-gradient(rgba(236,245,232,0.03) 1px, transparent 1px)",
       },
       animation: {
-        "pulse-slow": "pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        marquee: "marquee 40s linear infinite",
+        "radio-wave": "radio-wave 1.8s ease-out infinite",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "radio-wave": {
+          "0%": { transform: "scale(0.8)", opacity: "0.8" },
+          "100%": { transform: "scale(2.2)", opacity: "0" },
+        },
       },
     },
   },

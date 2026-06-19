@@ -2,40 +2,39 @@ interface SectionHeaderProps {
   title: string;
   subtitle?: string;
   count?: number;
-  accent?: "red" | "gold" | "neutral";
+  accent?: "live" | "gold" | "neutral";
 }
 
 export default function SectionHeader({
   title,
   subtitle,
   count,
-  accent = "red",
+  accent = "neutral",
 }: SectionHeaderProps) {
   const accentClass =
-    accent === "gold"
-      ? "from-gold to-gold-dark"
-      : accent === "neutral"
-        ? "from-white/30 to-white/10"
-        : "from-primary to-gold";
+    accent === "live"
+      ? "bg-live-red"
+      : accent === "gold"
+        ? "bg-card-gold"
+        : "bg-turf-green";
 
   return (
-    <div className="mb-4 flex items-end justify-between gap-3">
+    <div className="mb-5 flex items-end justify-between gap-3">
       <div className="flex items-center gap-3">
-        <div
-          className={`section-accent bg-gradient-to-b ${accentClass}`}
-          aria-hidden="true"
-        />
+        <div className={`h-6 w-1 ${accentClass}`} aria-hidden="true" />
         <div>
-          <h2 className="text-base font-bold tracking-tight text-white">
+          <h2 className="font-display text-2xl tracking-wide text-floodlight">
             {title}
           </h2>
           {subtitle && (
-            <p className="mt-0.5 text-xs text-white/40">{subtitle}</p>
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-goal-net/40">
+              {subtitle}
+            </p>
           )}
         </div>
       </div>
       {count !== undefined && (
-        <span className="font-mono text-xs font-semibold tabular-nums text-white/30">
+        <span className="font-display text-xl tabular-nums text-goal-net/25">
           {count}
         </span>
       )}

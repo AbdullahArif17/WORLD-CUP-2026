@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import CacheBanner from "@/components/CacheBanner";
 import ErrorBanner from "@/components/ErrorBanner";
 import MatchCard from "@/components/MatchCard";
-import PageHeader from "@/components/PageHeader";
+import MagneticButton from "@/components/ui/MagneticButton";
 import { SkeletonMatchCard } from "@/components/SkeletonCard";
 import {
   fetchAllMatches,
@@ -65,58 +65,55 @@ export default function FixturesPage() {
   }, [matches, filter]);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="All Fixtures"
-        subtitle={
-          loading
-            ? "Loading match schedule..."
-            : `${filteredMatches.length} of ${matches.length} matches`
-        }
-        badge="Schedule"
-      />
+    <div className="space-y-8">
+      <header className="jumbotron-panel px-6 py-8">
+        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-turf-green">
+          Full Schedule
+        </p>
+        <h1 className="mt-2 font-display text-5xl tracking-wide text-floodlight">
+          FIXTURES
+        </h1>
+        <p className="mt-2 font-mono text-xs text-goal-net/45">
+          {loading
+            ? "Loading match schedule…"
+            : `${filteredMatches.length} of ${matches.length} matches`}
+        </p>
+      </header>
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
-          <button
+          <MagneticButton
             key={f.key}
-            type="button"
+            active={filter === f.key}
             onClick={() => setFilter(f.key)}
-            className={`filter-pill ${
-              filter === f.key ? "filter-pill-active" : "filter-pill-inactive"
-            }`}
           >
             {f.label}
-          </button>
+          </MagneticButton>
         ))}
       </div>
 
       {fromCache && lastUpdated && (
         <CacheBanner lastUpdated={lastUpdated} error={error} />
       )}
-
       {!loading && error && !fromCache && <ErrorBanner message={error} />}
 
       {loading ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <SkeletonMatchCard key={i} />
           ))}
         </div>
       ) : filteredMatches.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredMatches.map((match) => (
             <MatchCard key={match.id} match={match} />
           ))}
         </div>
       ) : (
-        <div className="dashboard-card px-4 py-12 text-center">
-          <p className="text-sm font-medium text-white/40">No matches found</p>
-          {error && (
-            <p className="mt-2 text-xs text-primary/80">
-              {error}. Check your API key in .env.local
-            </p>
-          )}
+        <div className="jumbotron-panel px-6 py-16 text-center">
+          <p className="font-display text-xl text-goal-net/40">
+            No matches found
+          </p>
         </div>
       )}
     </div>
