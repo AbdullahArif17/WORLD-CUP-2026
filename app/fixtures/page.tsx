@@ -8,6 +8,7 @@ import MagneticButton from "@/components/ui/MagneticButton";
 import { SkeletonMatchCard } from "@/components/SkeletonCard";
 import {
   fetchAllMatches,
+  formatMatchDate,
   isFinishedStatus,
   isToday,
   isUpcomingStatus,
@@ -64,23 +65,72 @@ export default function FixturesPage() {
     }
   }, [matches, filter]);
 
+  const groupedMatches = useMemo(() => {
+    return filteredMatches.reduce<Array<{ label: string; matches: Match[] }>>(
+      (groups, match) => {
+        const label = formatMatchDate(match.utcDate);
+        const existing = groups.find((group) => group.label === label);
+        if (existing) {
+          existing.matches.push(match);
+        } else {
+          groups.push({ label, matches: [match] });
+        }
+        return groups;
+      },
+      []
+    );
+  }, [filteredMatches]);
+
   return (
-    <div className="space-y-8">
-      <header className="jumbotron-panel px-6 py-8">
-        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-turf-green">
-          Full Schedule
-        </p>
-        <h1 className="mt-2 font-display text-5xl tracking-wide text-floodlight">
-          FIXTURES
-        </h1>
-        <p className="mt-2 font-mono text-xs text-goal-net/45">
-          {loading
-            ? "Loading match schedule…"
-            : `${filteredMatches.length} of ${matches.length} matches`}
-        </p>
+    <div className="space-y-5">
+      <header className="dashboard-card overflow-hidden">
+        <div className="border-b border-goal-net/10 p-4 sm:p-5">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+            Match calendar
+          </p>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-floodlight sm:text-3xl">
+                Fixtures
+              </h1>
+              <p className="mt-1 text-sm text-goal-net/45">
+                {loading
+                  ? "Loading match schedule..."
+                  : `${filteredMatches.length} of ${matches.length} matches`}
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-sm bg-goal-net/5 px-3 py-2">
+                <p className="font-mono text-lg font-bold text-live-red">
+                  {matches.filter((match) => match.status === "LIVE").length}
+                </p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-goal-net/35">
+                  Live
+                </p>
+              </div>
+              <div className="rounded-sm bg-goal-net/5 px-3 py-2">
+                <p className="font-mono text-lg font-bold text-primary">
+                  {matches.filter((match) => isToday(match.utcDate)).length}
+                </p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-goal-net/35">
+                  Today
+                </p>
+              </div>
+              <div className="rounded-sm bg-goal-net/5 px-3 py-2">
+                <p className="font-mono text-lg font-bold text-card-gold">
+                  {matches.filter((match) => isUpcomingStatus(match.status)).length}
+                </p>
+                <p className="font-mono text-[9px] uppercase tracking-widest text-goal-net/35">
+                  Next
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="sticky top-[73px] z-20 -mx-4 border-y border-goal-net/10 bg-pitch-black/90 px-4 py-3 backdrop-blur-xl md:mx-0 md:rounded-md md:border">
+        <div className="flex gap-2 overflow-x-auto">
         {FILTERS.map((f) => (
           <MagneticButton
             key={f.key}
@@ -90,6 +140,7 @@ export default function FixturesPage() {
             {f.label}
           </MagneticButton>
         ))}
+        </div>
       </div>
 
       {fromCache && lastUpdated && (
@@ -103,10 +154,24 @@ export default function FixturesPage() {
             <SkeletonMatchCard key={i} />
           ))}
         </div>
-      ) : filteredMatches.length > 0 ? (
-        <div className="space-y-4">
-          {filteredMatches.map((match) => (
-            <MatchCard key={match.id} match={match} />
+      ) : groupedMatches.length > 0 ? (
+        <div className="space-y-5">
+          {groupedMatches.map((group) => (
+            <section key={group.label} className="space-y-2">
+              <div className="flex items-center justify-between rounded-md border border-goal-net/10 bg-surface-elevated/65 px-4 py-3">
+                <h2 className="font-mono text-xs font-bold uppercase tracking-widest text-floodlight">
+                  {group.label}
+                </h2>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-goal-net/35">
+                  {group.matches.length} matches
+                </span>
+              </div>
+              <div className="space-y-2">
+                {group.matches.map((match) => (
+                  <MatchCard key={match.id} match={match} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       ) : (

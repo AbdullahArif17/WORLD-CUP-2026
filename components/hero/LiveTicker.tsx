@@ -52,7 +52,7 @@ export default function LiveTicker({ matches }: LiveTickerProps) {
     return (
       <div className="border-t border-turf-green/20 bg-pitch-black/95 py-3 text-center">
         <p className="font-mono text-xs uppercase tracking-widest text-goal-net/40">
-          No live scores — check back on matchday
+          No live scores - check back on matchday
         </p>
       </div>
     );

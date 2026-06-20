@@ -49,8 +49,8 @@ export default function StandingsPage() {
           STANDINGS
         </h1>
         <p className="mt-2 font-mono text-xs text-goal-net/45">
-          Top 2 teams in each group advance —{" "}
-          {loading ? "…" : `${groups.length} groups`}
+          Top 2 teams in each group advance -{" "}
+          {loading ? "loading..." : `${groups.length} groups`}
         </p>
       </header>
 

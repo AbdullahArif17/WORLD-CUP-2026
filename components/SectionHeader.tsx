@@ -34,7 +34,10 @@ export default function SectionHeader({
         </div>
       </div>
       {count !== undefined && (
-        <span className="font-display text-xl tabular-nums text-goal-net/25">
+        <span
+          className="font-display text-xl tabular-nums text-goal-net/35"
+          aria-label={`${count} items`}
+        >
           {count}
         </span>
       )}

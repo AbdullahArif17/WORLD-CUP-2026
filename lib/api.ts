@@ -228,7 +228,9 @@ const TEAM_COUNTRY_CODES: Record<string, string> = {
   ZIM: "ZW",
 };
 
-export function getTeamFlag(tla: string): string {
+export function getTeamFlag(tla?: string | null): string {
+  if (!tla) return String.fromCodePoint(0x26bd);
+
   const countryCode = TEAM_COUNTRY_CODES[tla.toUpperCase()];
   if (!countryCode) return String.fromCodePoint(0x26bd);
 

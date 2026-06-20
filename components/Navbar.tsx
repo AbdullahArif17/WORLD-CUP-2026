@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
-import NavbarBall from "@/components/hero/NavbarBall";
 
 const links = [
   { href: "/", label: "Live" },
@@ -29,18 +28,21 @@ export default function Navbar() {
       style={{ backdropFilter, backgroundColor }}
       className="sticky top-0 z-50 border-b border-goal-net/10"
     >
-      <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link
           href="/"
-          className="flex shrink-0 cursor-pointer items-center gap-3 transition-opacity hover:opacity-90"
+          className="flex min-h-11 shrink-0 cursor-pointer items-center gap-3 rounded-sm transition-opacity hover:opacity-90"
+          aria-label="World Cup 2026 live tracker home"
         >
-          <NavbarBall />
+          <div className="flex h-9 w-9 items-center justify-center rounded-sm border border-primary/30 bg-primary/15 font-mono text-xs font-black text-primary">
+            WC
+          </div>
           <div>
             <span className="font-display text-lg leading-none tracking-wide text-floodlight">
               WC 2026
             </span>
             <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-[0.25em] text-goal-net/45">
-              USA · CAN · MEX
+              USA / CAN / MEX
             </span>
           </div>
         </Link>
@@ -55,6 +57,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive ? "page" : undefined}
                 className={`magnetic-btn shrink-0 rounded-sm px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-widest transition-all duration-200 ${
                   isActive
                     ? "bg-turf-green text-floodlight shadow-turf"

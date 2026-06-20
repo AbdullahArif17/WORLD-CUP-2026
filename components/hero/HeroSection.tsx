@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ScrollLinkedBall from "./ScrollLinkedBall";
 import LiveTicker from "./LiveTicker";
 import type { Match } from "@/lib/types";
 import { fetchAllMatches, isLiveStatus, isFinishedStatus } from "@/lib/api";
@@ -27,37 +26,53 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative -mx-4 mb-8 overflow-hidden md:-mx-0 md:rounded-sm">
+    <section className="dashboard-card relative -mx-4 mb-6 overflow-hidden md:-mx-0">
       <div
-        className="pointer-events-none absolute inset-0 bg-floodlight-radial"
+        className="pointer-events-none absolute inset-0 bg-pitch-lines bg-[length:36px_36px] opacity-20"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-pitch-lines bg-[length:48px_48px] opacity-30"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(248,255,244,0.08)_0%,transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-live-red via-card-gold to-primary"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 px-4 pb-2 pt-8 text-center md:pt-12">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.35em] text-turf-green">
-          FIFA World Cup
-        </p>
-        <h1 className="font-display text-[clamp(3rem,12vw,8rem)] leading-[0.9] tracking-tight text-floodlight">
-          WORLD CUP
-          <br />
-          <span className="text-turf-green">2026</span>
-        </h1>
-        <p className="mt-4 font-mono text-xs uppercase tracking-[0.4em] text-goal-net/60">
-          USA · CANADA · MEXICO
-        </p>
-      </div>
+      <div className="relative z-10 grid gap-5 p-4 sm:p-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-sm bg-primary px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-pitch-black">
+              World Cup 2026
+            </span>
+            <span className="rounded-sm border border-goal-net/10 bg-pitch-black/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-goal-net/45">
+              Live scores
+            </span>
+          </div>
+          <h1 className="mt-4 max-w-2xl text-3xl font-bold leading-tight text-floodlight sm:text-4xl">
+            Scores, fixtures, lineups and player stats in one match centre.
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-goal-net/55">
+            Built around the SofaScore/FotMob workflow: fast match rows, player
+            leaders, lineups, event timelines, standings and detailed match
+            pages.
+          </p>
+        </div>
 
-      {/* 3D ball lives here — absolute, not fixed */}
-      <div className="relative z-10 mx-auto h-[260px] w-full max-w-lg md:h-[320px]">
-        <ScrollLinkedBall />
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
+          {[
+            ["Live", "Match status"],
+            ["Lineups", "XI + bench"],
+            ["Ratings", "Player form"],
+            ["Tables", "Group stage"],
+          ].map(([label, value]) => (
+            <div key={label} className="stat-block">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-goal-net/35">
+                {label}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-floodlight">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <LiveTicker matches={tickerMatches} />

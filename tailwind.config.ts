@@ -10,11 +10,15 @@ const config: Config = {
     extend: {
       colors: {
         "pitch-black": "#0A0E0A",
+        pitch: "#102217",
+        "surface-elevated": "#111A13",
         floodlight: "#F8FFF4",
         "turf-green": "#1B5E3F",
         "goal-net": "#ECF5E8",
         "card-gold": "#D4AF37",
+        gold: "#D4AF37",
         "live-red": "#E63946",
+        primary: "#47C77A",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

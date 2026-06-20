@@ -77,11 +77,15 @@ const TEAM_COUNTRY_CODES: Record<string, string> = {
   ZIM: "ZW",
 };
 
-export function getCountryCode(tla: string): string | null {
+export function getCountryCode(tla?: string | null): string | null {
+  if (!tla) return null;
   return TEAM_COUNTRY_CODES[tla.toUpperCase()] ?? null;
 }
 
-export function getFlagUrl(tla: string, size: "w40" | "w80" = "w80"): string {
+export function getFlagUrl(
+  tla?: string | null,
+  size: "w40" | "w80" = "w80"
+): string {
   const code = getCountryCode(tla);
   if (!code) return "";
   return `https://flagcdn.com/${size}/${code.toLowerCase()}.png`;

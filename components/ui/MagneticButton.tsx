@@ -38,7 +38,7 @@ export default function MagneticButton({
       }}
       animate={{ x: offset.x, y: offset.y }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={`magnetic-btn rounded-full px-5 py-2 font-mono text-xs font-semibold uppercase tracking-widest transition-colors ${
+      className={`magnetic-btn rounded-sm px-5 py-2 font-mono text-xs font-semibold uppercase tracking-widest transition-colors ${
         active
           ? "bg-turf-green text-floodlight shadow-turf"
           : "border border-goal-net/15 bg-pitch-black/60 text-goal-net/60 hover:border-turf-green/40 hover:text-floodlight"

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { getFlagUrl } from "@/lib/flags";
 
 interface TeamFlagProps {
-  tla: string;
+  tla?: string | null;
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -24,11 +24,13 @@ export default function TeamFlag({
   const dim = sizes[size];
 
   if (!url) {
+    const label = tla?.slice(0, 3) || "TBD";
+
     return (
       <div
         className={`flex items-center justify-center rounded-sm bg-turf-green/20 font-display text-[10px] text-goal-net/60 ${dim.class} ${className}`}
       >
-        {tla.slice(0, 3)}
+        {label}
       </div>
     );
   }
@@ -36,7 +38,7 @@ export default function TeamFlag({
   return (
     <Image
       src={url}
-      alt={`${tla} flag`}
+      alt={`${tla ?? "Team"} flag`}
       width={dim.w}
       height={dim.h}
       className={`rounded-sm object-cover shadow-sm ${dim.class} ${className}`}

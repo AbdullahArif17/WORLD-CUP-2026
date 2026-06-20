@@ -21,7 +21,7 @@ function StatItem({
       ? "text-primary"
       : highlight === "gold"
         ? "text-gold"
-        : "text-white";
+        : "text-floodlight";
 
   return (
     <div className="stat-block flex flex-1 flex-col items-center gap-1 text-center">
@@ -34,7 +34,7 @@ function StatItem({
           {value}
         </span>
       )}
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-goal-net/40">
         {label}
       </span>
     </div>

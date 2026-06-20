@@ -5,6 +5,8 @@ import CacheBanner from "@/components/CacheBanner";
 import ErrorBanner from "@/components/ErrorBanner";
 import PageHeader from "@/components/PageHeader";
 import { SkeletonGroupTable, SkeletonStats } from "@/components/SkeletonCard";
+import PlayerAvatar from "@/components/ui/PlayerAvatar";
+import PlayerRating from "@/components/ui/PlayerRating";
 import { fetchAllMatches, fetchScorers, getTeamFlag } from "@/lib/api";
 import type { Match, Scorer } from "@/lib/types";
 
@@ -23,6 +25,93 @@ function StatTile({ label, value }: { label: string; value: number | string }) {
 
 function scoreValue(value: number | null | undefined) {
   return typeof value === "number" ? value : 0;
+}
+
+function ScorerHero({ scorer }: { scorer: Scorer }) {
+  return (
+    <section className="dashboard-card relative overflow-hidden p-5">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-card-gold via-primary to-live-red"
+        aria-hidden="true"
+      />
+      <div className="grid gap-5 md:grid-cols-[auto_1fr_auto] md:items-center">
+        <PlayerAvatar player={scorer.player} size="xl" />
+        <div className="min-w-0">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-card-gold">
+            Golden boot leader
+          </p>
+          <h2 className="mt-1 truncate text-3xl font-black text-floodlight">
+            {scorer.player.name}
+          </h2>
+          <p className="mt-2 truncate text-sm text-goal-net/45">
+            <span aria-hidden="true">{getTeamFlag(scorer.team.tla)}</span>{" "}
+            {scorer.team.shortName || scorer.team.name}
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-center md:min-w-64">
+          <div className="rounded-md bg-card-gold/15 p-3">
+            <p className="font-mono text-3xl font-black text-card-gold">
+              {scorer.goals}
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-goal-net/40">
+              Goals
+            </p>
+          </div>
+          <div className="rounded-md bg-goal-net/5 p-3">
+            <p className="font-mono text-3xl font-black text-floodlight">
+              {scorer.assists ?? "-"}
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-goal-net/40">
+              Assists
+            </p>
+          </div>
+          <div className="rounded-md bg-goal-net/5 p-3">
+            <div className="flex h-9 items-center justify-center">
+              <PlayerRating player={scorer.player} />
+            </div>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-goal-net/40">
+              Rating
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PodiumCard({ scorer, rank }: { scorer: Scorer; rank: number }) {
+  return (
+    <article className="relative overflow-hidden rounded-md border border-goal-net/10 bg-pitch-black/55 p-4">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-primary/15 to-transparent"
+        aria-hidden="true"
+      />
+      <div className="relative flex items-start justify-between">
+        <PlayerAvatar player={scorer.player} size="lg" />
+        <span className="rounded-sm bg-goal-net/10 px-2 py-1 font-mono text-xs font-black text-goal-net/55">
+          #{rank}
+        </span>
+      </div>
+      <h3 className="mt-4 truncate text-sm font-bold text-floodlight">
+        {scorer.player.name}
+      </h3>
+      <p className="mt-1 truncate text-xs text-goal-net/40">
+        <span aria-hidden="true">{getTeamFlag(scorer.team.tla)}</span>{" "}
+        {scorer.team.shortName || scorer.team.name}
+      </p>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="font-mono text-2xl font-black text-card-gold">
+            {scorer.goals}
+          </p>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-goal-net/35">
+            Goals
+          </p>
+        </div>
+        <PlayerRating player={scorer.player} />
+      </div>
+    </article>
+  );
 }
 
 export default function ScorersPage() {
@@ -77,6 +166,9 @@ export default function ScorersPage() {
     };
   }, [matches]);
 
+  const leader = scorers[0];
+  const podium = scorers.slice(0, 3);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -84,6 +176,8 @@ export default function ScorersPage() {
         subtitle="Top scorers, goals and match totals"
         badge="Stats"
       />
+
+      {!loading && leader && <ScorerHero scorer={leader} />}
 
       {loading ? (
         <SkeletonStats />
@@ -104,10 +198,22 @@ export default function ScorersPage() {
 
       {!loading && error && !fromCache && <ErrorBanner message={error} />}
 
+      {!loading && podium.length > 0 && (
+        <section className="grid gap-3 md:grid-cols-3">
+          {podium.map((scorer, index) => (
+            <PodiumCard
+              key={`${scorer.player.id}-${scorer.team.id}-podium`}
+              scorer={scorer}
+              rank={index + 1}
+            />
+          ))}
+        </section>
+      )}
+
       <section className="dashboard-card overflow-hidden">
         <div className="border-b border-white/[0.06] bg-surface-elevated/40 px-4 py-3">
           <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-white">
-            Top Scorers
+            Full scorer leaderboard
           </h2>
         </div>
 
@@ -120,11 +226,12 @@ export default function ScorersPage() {
             {scorers.map((scorer, index) => (
               <div
                 key={`${scorer.player.id}-${scorer.team.id}`}
-                className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3"
+                className="grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-goal-net/[0.03]"
               >
                 <span className="font-mono text-sm font-bold text-white/30">
                   {index + 1}
                 </span>
+                <PlayerAvatar player={scorer.player} size="md" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-white/85">
                     {scorer.player.name}
@@ -133,14 +240,20 @@ export default function ScorersPage() {
                     <span aria-hidden="true">{getTeamFlag(scorer.team.tla)}</span>{" "}
                     {scorer.team.shortName || scorer.team.name}
                   </p>
+                  <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-widest text-white/25">
+                    {scorer.player.position ?? scorer.player.nationality ?? "Player"}
+                  </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-mono text-xl font-bold text-gold">
-                    {scorer.goals}
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
-                    goals
-                  </p>
+                <div className="flex items-center gap-3 text-right">
+                  <PlayerRating player={scorer.player} compact />
+                  <div>
+                    <p className="font-mono text-xl font-bold text-gold">
+                      {scorer.goals}
+                    </p>
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+                      goals
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}

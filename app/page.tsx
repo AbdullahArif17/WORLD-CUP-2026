@@ -3,17 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import HeroSection from "@/components/hero/HeroSection";
 import CacheBanner from "@/components/CacheBanner";
+import DashboardStats from "@/components/DashboardStats";
 import ErrorBanner from "@/components/ErrorBanner";
 import MatchCard from "@/components/MatchCard";
+import PlayerSpotlight from "@/components/PlayerSpotlight";
 import SectionHeader from "@/components/SectionHeader";
 import { SkeletonMatchCard } from "@/components/SkeletonCard";
 import {
   fetchAllMatches,
+  fetchScorers,
   isLiveStatus,
   isToday,
   isUpcomingStatus,
 } from "@/lib/api";
-import type { Match } from "@/lib/types";
+import type { Match, Scorer } from "@/lib/types";
 
 const REFRESH_INTERVAL = 60_000;
 
@@ -21,6 +24,7 @@ export default function HomePage() {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
   const [todayMatches, setTodayMatches] = useState<Match[]>([]);
   const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [scorers, setScorers] = useState<Scorer[]>([]);
   const [loading, setLoading] = useState(true);
   const [fromCache, setFromCache] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
@@ -28,8 +32,11 @@ export default function HomePage() {
 
   const loadMatches = useCallback(async () => {
     try {
-      const result = await fetchAllMatches();
-      const matches = result.data.matches ?? [];
+      const [matchResult, scorerResult] = await Promise.all([
+        fetchAllMatches(),
+        fetchScorers(),
+      ]);
+      const matches = matchResult.data.matches ?? [];
 
       const live = matches.filter((m) => isLiveStatus(m.status));
       const today = matches
@@ -49,9 +56,12 @@ export default function HomePage() {
       setLiveMatches(live);
       setTodayMatches(today);
       setUpcomingMatches(upcoming);
-      setFromCache(result.fromCache);
-      setLastUpdated(result.timestamp);
-      setError(result.error ?? null);
+      setScorers(scorerResult.data.scorers ?? []);
+      setFromCache(matchResult.fromCache || scorerResult.fromCache);
+      setLastUpdated(
+        Math.max(matchResult.timestamp ?? 0, scorerResult.timestamp ?? 0)
+      );
+      setError(matchResult.error ?? scorerResult.error ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load matches");
     } finally {
@@ -66,7 +76,7 @@ export default function HomePage() {
   }, [loadMatches]);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <HeroSection />
 
       {fromCache && lastUpdated && (
@@ -74,7 +84,17 @@ export default function HomePage() {
       )}
       {!loading && error && !fromCache && <ErrorBanner message={error} />}
 
-      <section>
+      <DashboardStats
+        liveCount={liveMatches.length}
+        todayCount={todayMatches.length}
+        upcomingCount={upcomingMatches.length}
+        loading={loading}
+      />
+
+      <PlayerSpotlight scorers={scorers} loading={loading} />
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr]">
+        <section>
           <SectionHeader
             title="Live Now"
             subtitle="Matches in progress"
@@ -120,33 +140,34 @@ export default function HomePage() {
             </div>
           )}
         </section>
+      </div>
 
-        <section>
-          <SectionHeader
-            title="Upcoming"
-            subtitle="Next 5 fixtures"
-            count={upcomingMatches.length}
-            accent="gold"
-          />
-          {loading ? (
-            <div className="space-y-4">
-              <SkeletonMatchCard />
-              <SkeletonMatchCard />
-            </div>
-          ) : upcomingMatches.length > 0 ? (
-            <div className="space-y-4">
-              {upcomingMatches.map((match) => (
-                <MatchCard key={match.id} match={match} />
-              ))}
-            </div>
-          ) : (
-            <div className="jumbotron-panel px-6 py-10 text-center">
-              <p className="font-mono text-xs uppercase tracking-widest text-goal-net/35">
-                No upcoming matches
-              </p>
-            </div>
-          )}
-        </section>
+      <section>
+        <SectionHeader
+          title="Upcoming"
+          subtitle="Next 5 fixtures"
+          count={upcomingMatches.length}
+          accent="gold"
+        />
+        {loading ? (
+          <div className="space-y-4">
+            <SkeletonMatchCard />
+            <SkeletonMatchCard />
+          </div>
+        ) : upcomingMatches.length > 0 ? (
+          <div className="space-y-4">
+            {upcomingMatches.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        ) : (
+          <div className="jumbotron-panel px-6 py-10 text-center">
+            <p className="font-mono text-xs uppercase tracking-widest text-goal-net/35">
+              No upcoming matches
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

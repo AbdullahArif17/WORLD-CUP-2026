@@ -5,6 +5,8 @@ import CacheBanner from "@/components/CacheBanner";
 import ErrorBanner from "@/components/ErrorBanner";
 import PageHeader from "@/components/PageHeader";
 import { SkeletonGroupTable } from "@/components/SkeletonCard";
+import PlayerAvatar from "@/components/ui/PlayerAvatar";
+import PlayerRating from "@/components/ui/PlayerRating";
 import { fetchTeams, getTeamFlag } from "@/lib/api";
 import type { Team } from "@/lib/types";
 
@@ -67,9 +69,10 @@ function TeamCard({ team }: { team: Team }) {
             {squad.slice(0, 12).map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between gap-2 rounded-lg bg-white/[0.03] px-3 py-2"
+                className="flex items-center gap-3 rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-2"
               >
-                <div className="min-w-0">
+                <PlayerAvatar player={player} size="sm" />
+                <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold text-white/75">
                     {player.name}
                   </p>
@@ -77,11 +80,7 @@ function TeamCard({ team }: { team: Team }) {
                     {player.position ?? player.nationality ?? "Player"}
                   </p>
                 </div>
-                {player.shirtNumber && (
-                  <span className="font-mono text-xs font-bold text-white/35">
-                    {player.shirtNumber}
-                  </span>
-                )}
+                <PlayerRating player={player} compact />
               </div>
             ))}
           </div>

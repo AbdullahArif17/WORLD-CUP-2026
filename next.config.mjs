@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "flagcdn.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "r2.thesportsdb.com",
+        pathname: "/**",
+      },
     ],
   },
 };

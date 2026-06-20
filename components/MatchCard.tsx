@@ -28,83 +28,120 @@ export default function MatchCard({ match }: MatchCardProps) {
   const cardClass = `match-card-pitch ${isLive ? "match-card-live" : ""} ${
     isFinished ? "opacity-80" : ""
   }`;
+  const homeName = match.homeTeam.shortName || match.homeTeam.name || "TBD";
+  const awayName = match.awayTeam.shortName || match.awayTeam.name || "TBD";
+  const statusLabel = isLive
+    ? match.minute !== null
+      ? `${match.minute}'`
+      : "Live"
+    : isFinished
+      ? "FT"
+      : formatMatchTime(match.utcDate);
 
   return (
     <article className={cardClass}>
-      <Link href={`/matches/${match.id}`} className="block">
-        <div className="relative p-5">
-          <div className="mb-5 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+      <Link
+        href={`/matches/${match.id}`}
+        className="block rounded-md"
+        aria-label={`${match.homeTeam.name ?? homeName} versus ${
+          match.awayTeam.name ?? awayName
+        }`}
+      >
+        <div className="relative p-3 sm:p-4">
+          <div className="mb-3 flex items-center justify-between gap-3 border-b border-goal-net/10 pb-3">
+            <div className="flex min-w-0 items-center gap-2">
               {isLive && <LiveBadge />}
               {match.group && (
-                <span className="font-mono text-[10px] uppercase tracking-widest text-turf-green/70">
+                <span className="truncate font-mono text-[10px] uppercase tracking-widest text-primary/80">
                   {formatGroupLabel(match.group)}
                 </span>
               )}
               {isFinished && !isLive && (
-                <span className="font-mono text-[10px] uppercase tracking-widest text-goal-net/35">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-goal-net/45">
                   Full Time
                 </span>
               )}
             </div>
-            <div className="text-right font-mono text-[10px] uppercase tracking-wide text-goal-net/40">
+            <div className="shrink-0 text-right font-mono text-[10px] uppercase tracking-wide text-goal-net/45">
               <div>{formatMatchDate(match.utcDate)}</div>
-              {!isLive && <div>{formatMatchTime(match.utcDate)}</div>}
+              <div>{statusLabel}</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <TeamFlag tla={match.homeTeam.tla} size="lg" />
-              <span
-                className={`font-display text-xl tracking-wide ${
-                  isFinished ? "text-goal-net/50" : "text-floodlight"
-                }`}
-              >
-                {match.homeTeam.tla || match.homeTeam.shortName}
-              </span>
-              <span className="max-w-full truncate font-mono text-[10px] text-goal-net/35">
-                {match.homeTeam.shortName || match.homeTeam.name}
-              </span>
-            </div>
-
-            <div className="flex min-w-[100px] flex-col items-center rounded-sm border border-turf-green/20 bg-turf-green/5 px-5 py-4">
-              {hasScore ? (
-                <div className="flex items-baseline gap-1 font-display text-4xl font-bold tabular-nums leading-none text-floodlight md:text-5xl">
-                  <AnimatedScore value={homeScore!} />
-                  <span className="text-goal-net/30">:</span>
-                  <AnimatedScore value={awayScore!} />
+          <div className="grid grid-cols-[1fr_auto] items-center gap-4">
+            <div className="min-w-0 space-y-3">
+              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+                <TeamFlag tla={match.homeTeam.tla} size="md" />
+                <div className="min-w-0">
+                  <p
+                    className={`truncate text-sm font-bold ${
+                      isFinished ? "text-goal-net/60" : "text-floodlight"
+                    }`}
+                  >
+                    {homeName}
+                  </p>
+                  <p className="truncate font-mono text-[10px] uppercase tracking-widest text-goal-net/30">
+                    {match.homeTeam.tla || "TBD"}
+                  </p>
                 </div>
-              ) : (
-                <span className="font-display text-2xl text-goal-net/30">VS</span>
-              )}
-              {isLive && match.minute !== null && (
-                <span className="mt-2 font-mono text-sm font-bold text-live-red">
-                  {match.minute}&apos;
+                <span className="font-mono text-xl font-black tabular-nums text-floodlight">
+                  {hasScore ? <AnimatedScore value={homeScore!} /> : "-"}
                 </span>
-              )}
+              </div>
+
+              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+                <TeamFlag tla={match.awayTeam.tla} size="md" />
+                <div className="min-w-0">
+                  <p
+                    className={`truncate text-sm font-bold ${
+                      isFinished ? "text-goal-net/60" : "text-floodlight"
+                    }`}
+                  >
+                    {awayName}
+                  </p>
+                  <p className="truncate font-mono text-[10px] uppercase tracking-widest text-goal-net/30">
+                    {match.awayTeam.tla || "TBD"}
+                  </p>
+                </div>
+                <span className="font-mono text-xl font-black tabular-nums text-floodlight">
+                  {hasScore ? <AnimatedScore value={awayScore!} /> : "-"}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col items-center gap-2 text-center">
-              <TeamFlag tla={match.awayTeam.tla} size="lg" />
+            <div className="hidden min-w-[116px] flex-col gap-2 sm:flex">
               <span
-                className={`font-display text-xl tracking-wide ${
-                  isFinished ? "text-goal-net/50" : "text-floodlight"
+                className={`rounded-sm px-3 py-2 text-center font-mono text-xs font-bold uppercase tracking-widest ${
+                  isLive
+                    ? "bg-live-red/15 text-live-red"
+                    : isFinished
+                      ? "bg-goal-net/10 text-goal-net/55"
+                      : "bg-primary/15 text-primary"
                 }`}
               >
-                {match.awayTeam.tla || match.awayTeam.shortName}
+                {statusLabel}
               </span>
-              <span className="max-w-full truncate font-mono text-[10px] text-goal-net/35">
-                {match.awayTeam.shortName || match.awayTeam.name}
+              <span className="rounded-sm border border-goal-net/10 bg-pitch-black/45 px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-goal-net/45">
+                Match centre
               </span>
             </div>
           </div>
 
-          {match.venue && (
-            <p className="mt-4 truncate text-center font-mono text-[10px] uppercase tracking-widest text-goal-net/25">
-              {match.venue}
-            </p>
-          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-goal-net/10 pt-3">
+            {["Lineups", "Stats", "Timeline"].map((label) => (
+              <span
+                key={label}
+                className="rounded-sm bg-goal-net/5 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-goal-net/35"
+              >
+                {label}
+              </span>
+            ))}
+            {match.venue && (
+              <span className="ml-auto max-w-full truncate font-mono text-[10px] uppercase tracking-widest text-goal-net/30">
+                {match.venue}
+              </span>
+            )}
+          </div>
         </div>
       </Link>
     </article>
