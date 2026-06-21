@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import CacheBanner from "@/components/CacheBanner";
@@ -14,13 +15,14 @@ import PageHeader from "@/components/PageHeader";
 import { SkeletonGroupTable } from "@/components/SkeletonCard";
 import PlayerAvatar from "@/components/ui/PlayerAvatar";
 import PlayerRating from "@/components/ui/PlayerRating";
+import TeamCrest from "@/components/ui/TeamCrest";
 import {
   fetchMatchDetails,
   formatGroupLabel,
   formatMatchDate,
   formatMatchTime,
-  getTeamFlag,
 } from "@/lib/api";
+import { getVenueImage } from "@/lib/images";
 import type { MatchDetails } from "@/lib/types";
 
 function EmptyPanel({ message }: { message: string }) {
@@ -80,7 +82,7 @@ function MatchScorersPanel({ match }: { match: MatchDetails }) {
                 className="flex items-center gap-3 rounded-md border border-goal-net/10 bg-pitch-black/45 p-3"
               >
                 {player ? (
-                  <PlayerAvatar player={player} size="md" />
+                  <PlayerAvatar player={player} size="md" loadPhoto />
                 ) : (
                   <div className="h-12 w-12 rounded-full bg-goal-net/10" />
                 )}
@@ -271,9 +273,9 @@ export default function MatchDetailsPage() {
             />
             <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center">
               <div className="min-w-0">
-                <p className="text-5xl leading-none" aria-hidden="true">
-                  {getTeamFlag(match.homeTeam.tla)}
-                </p>
+                <div className="mx-auto flex justify-center">
+                  <TeamCrest team={match.homeTeam} size="lg" />
+                </div>
                 <p className="mt-3 truncate text-base font-bold text-floodlight">
                   {match.homeTeam.shortName || match.homeTeam.name}
                 </p>
@@ -292,9 +294,9 @@ export default function MatchDetailsPage() {
                 </p>
               </div>
               <div className="min-w-0">
-                <p className="text-5xl leading-none" aria-hidden="true">
-                  {getTeamFlag(match.awayTeam.tla)}
-                </p>
+                <div className="mx-auto flex justify-center">
+                  <TeamCrest team={match.awayTeam} size="lg" />
+                </div>
                 <p className="mt-3 truncate text-base font-bold text-floodlight">
                   {match.awayTeam.shortName || match.awayTeam.name}
                 </p>
@@ -354,7 +356,31 @@ export default function MatchDetailsPage() {
             <MatchTimelinePanel match={match} />
           </div>
 
-          <section id="info" className="grid scroll-mt-28 gap-4 sm:grid-cols-2">
+          <section id="info" className="grid scroll-mt-28 gap-4 lg:grid-cols-3">
+            <div className="dashboard-card overflow-hidden">
+              <div className="relative aspect-video bg-pitch">
+                <Image
+                  src={getVenueImage(match.venue)}
+                  alt={match.venue ? `${match.venue} venue` : "Venue image"}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="object-cover"
+                  unoptimized
+                />
+                <div
+                  className="absolute inset-0 bg-gradient-to-t from-pitch-black/80 to-transparent"
+                  aria-hidden="true"
+                />
+                <div className="absolute bottom-3 left-3 right-3">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                    Venue
+                  </p>
+                  <h2 className="mt-1 truncate text-sm font-bold text-floodlight">
+                    {match.venue ?? "Venue TBA"}
+                  </h2>
+                </div>
+              </div>
+            </div>
             <div className="dashboard-card p-4">
               <h2 className="font-mono text-sm font-bold uppercase tracking-wide text-white">
                 Referees

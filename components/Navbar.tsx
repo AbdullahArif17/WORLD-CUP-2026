@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -8,7 +9,6 @@ const links = [
   { href: "/", label: "Live" },
   { href: "/standings", label: "Tables" },
   { href: "/fixtures", label: "Fixtures" },
-  { href: "/teams", label: "Teams" },
   { href: "/scorers", label: "Stats" },
 ];
 
@@ -34,15 +34,35 @@ export default function Navbar() {
           className="flex min-h-11 shrink-0 cursor-pointer items-center gap-3 rounded-sm transition-opacity hover:opacity-90"
           aria-label="World Cup 2026 live tracker home"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-sm border border-primary/30 bg-primary/15 font-mono text-xs font-black text-primary">
-            WC
+          <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-primary/35 bg-black shadow-turf">
+            <Image
+              src="/images/logo.png"
+              alt="World Cup trophy logo"
+              fill
+              sizes="48px"
+              className="object-contain p-1"
+              priority
+            />
           </div>
           <div>
             <span className="font-display text-lg leading-none tracking-wide text-floodlight">
               WC 2026
             </span>
-            <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-[0.25em] text-goal-net/45">
-              USA / CAN / MEX
+            <span className="mt-1 flex items-center gap-1">
+              {[
+                ["/images/flag-us.png", "USA"],
+                ["/images/flag-ca.png", "Canada"],
+                ["/images/flag-mx.png", "Mexico"],
+              ].map(([src, alt]) => (
+                <Image
+                  key={src}
+                  src={src}
+                  alt={`${alt} flag`}
+                  width={18}
+                  height={12}
+                  className="h-3 w-[18px] rounded-[2px] object-cover"
+                />
+              ))}
             </span>
           </div>
         </Link>

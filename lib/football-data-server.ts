@@ -3,10 +3,7 @@ import "server-only";
 const BASE_URL = "https://api.football-data.org/v4";
 
 function getApiKey(): string {
-  const key =
-    process.env.FOOTBALL_DATA_API_KEY ??
-    process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY ??
-    "";
+  const key = process.env.FOOTBALL_DATA_API_KEY ?? "";
   return key.trim();
 }
 

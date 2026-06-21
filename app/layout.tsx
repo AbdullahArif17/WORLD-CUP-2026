@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   title: "World Cup 2026 | Live Tracker",
   description:
     "Elite live scores, fixtures, and group standings for FIFA World Cup 2026",
+  icons: {
+    icon: "/images/logo.png",
+    shortcut: "/images/logo.png",
+    apple: "/images/logo.png",
+  },
 };
 
 export default function RootLayout({

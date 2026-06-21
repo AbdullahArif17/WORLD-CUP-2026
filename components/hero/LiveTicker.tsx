@@ -1,6 +1,6 @@
 import type { Match } from "@/lib/types";
 import { isLiveStatus, isFinishedStatus } from "@/lib/api";
-import TeamFlag from "@/components/ui/TeamFlag";
+import TeamCrest from "@/components/ui/TeamCrest";
 
 interface LiveTickerProps {
   matches: Match[];
@@ -21,7 +21,7 @@ function TickerItem({ match }: { match: Match }) {
           <span className="relative inline-flex h-2 w-2 rounded-full bg-live-red" />
         </span>
       )}
-      <TeamFlag tla={match.homeTeam.tla} size="sm" />
+      <TeamCrest team={match.homeTeam} size="sm" />
       <span className="font-display text-sm tracking-wide text-floodlight">
         {match.homeTeam.tla}
       </span>
@@ -31,7 +31,7 @@ function TickerItem({ match }: { match: Match }) {
       <span className="font-display text-sm tracking-wide text-floodlight">
         {match.awayTeam.tla}
       </span>
-      <TeamFlag tla={match.awayTeam.tla} size="sm" />
+      <TeamCrest team={match.awayTeam} size="sm" />
       {isLive && match.minute !== null && (
         <span className="font-mono text-xs text-live-red">{match.minute}&apos;</span>
       )}

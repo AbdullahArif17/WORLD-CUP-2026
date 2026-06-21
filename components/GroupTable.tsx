@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { GroupStanding } from "@/lib/types";
 import { formatGroupLabel } from "@/lib/api";
-import TeamFlag from "@/components/ui/TeamFlag";
+import TeamCrest from "@/components/ui/TeamCrest";
 
 interface GroupTableProps {
   group: GroupStanding;
@@ -76,7 +76,7 @@ export default function GroupTable({ group, index = 0 }: GroupTableProps) {
                   </td>
                   <td className="px-2 py-3.5">
                     <div className="flex items-center gap-3">
-                      <TeamFlag tla={row.team.tla} size="sm" />
+                      <TeamCrest team={row.team} size="sm" />
                       <span
                         className={`font-display text-base tracking-wide ${
                           advances ? "text-card-gold" : "text-floodlight"

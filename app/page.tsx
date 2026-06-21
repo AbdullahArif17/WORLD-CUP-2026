@@ -12,6 +12,7 @@ import { SkeletonMatchCard } from "@/components/SkeletonCard";
 import {
   fetchAllMatches,
   fetchScorers,
+  isFinishedStatus,
   isLiveStatus,
   isToday,
   isUpcomingStatus,
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
   const [todayMatches, setTodayMatches] = useState<Match[]>([]);
   const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
+  const [tickerMatches, setTickerMatches] = useState<Match[]>([]);
   const [scorers, setScorers] = useState<Scorer[]>([]);
   const [loading, setLoading] = useState(true);
   const [fromCache, setFromCache] = useState(false);
@@ -39,6 +41,13 @@ export default function HomePage() {
       const matches = matchResult.data.matches ?? [];
 
       const live = matches.filter((m) => isLiveStatus(m.status));
+      const recent = matches
+        .filter((m) => isFinishedStatus(m.status))
+        .sort(
+          (a, b) =>
+            new Date(b.utcDate).getTime() - new Date(a.utcDate).getTime()
+        )
+        .slice(0, 8);
       const today = matches
         .filter((m) => isToday(m.utcDate) && !isLiveStatus(m.status))
         .sort(
@@ -56,6 +65,7 @@ export default function HomePage() {
       setLiveMatches(live);
       setTodayMatches(today);
       setUpcomingMatches(upcoming);
+      setTickerMatches(live.length > 0 ? live : recent);
       setScorers(scorerResult.data.scorers ?? []);
       setFromCache(matchResult.fromCache || scorerResult.fromCache);
       setLastUpdated(
@@ -77,7 +87,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      <HeroSection />
+      <HeroSection tickerMatches={tickerMatches} />
 
       {fromCache && lastUpdated && (
         <CacheBanner lastUpdated={lastUpdated} error={error} />

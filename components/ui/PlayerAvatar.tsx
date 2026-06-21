@@ -9,6 +9,7 @@ interface PlayerAvatarProps {
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
   showInitials?: boolean;
+  loadPhoto?: boolean;
 }
 
 const imageCache = new Map<string, string>();
@@ -67,10 +68,13 @@ export default function PlayerAvatar({
   size = "md",
   className = "",
   showInitials = false,
+  loadPhoto = false,
 }: PlayerAvatarProps) {
   const [photoUrl, setPhotoUrl] = useState(() => imageCache.get(player.name) ?? "");
 
   useEffect(() => {
+    if (!loadPhoto) return;
+
     let cancelled = false;
     const cached = imageCache.get(player.name);
 
@@ -96,7 +100,7 @@ export default function PlayerAvatar({
     return () => {
       cancelled = true;
     };
-  }, [player.name]);
+  }, [loadPhoto, player.name]);
 
   return (
     <div

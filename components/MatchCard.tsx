@@ -10,7 +10,7 @@ import {
   isLiveStatus,
 } from "@/lib/api";
 import LiveBadge from "./LiveBadge";
-import TeamFlag from "@/components/ui/TeamFlag";
+import TeamCrest from "@/components/ui/TeamCrest";
 import AnimatedScore from "@/components/ui/AnimatedScore";
 
 interface MatchCardProps {
@@ -71,7 +71,7 @@ export default function MatchCard({ match }: MatchCardProps) {
           <div className="grid grid-cols-[1fr_auto] items-center gap-4">
             <div className="min-w-0 space-y-3">
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-                <TeamFlag tla={match.homeTeam.tla} size="md" />
+                <TeamCrest team={match.homeTeam} size="md" />
                 <div className="min-w-0">
                   <p
                     className={`truncate text-sm font-bold ${
@@ -90,7 +90,7 @@ export default function MatchCard({ match }: MatchCardProps) {
               </div>
 
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-                <TeamFlag tla={match.awayTeam.tla} size="md" />
+                <TeamCrest team={match.awayTeam} size="md" />
                 <div className="min-w-0">
                   <p
                     className={`truncate text-sm font-bold ${

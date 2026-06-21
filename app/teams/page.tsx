@@ -1,38 +1,116 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CacheBanner from "@/components/CacheBanner";
 import ErrorBanner from "@/components/ErrorBanner";
 import PageHeader from "@/components/PageHeader";
 import { SkeletonGroupTable } from "@/components/SkeletonCard";
+import CountryFlag from "@/components/ui/CountryFlag";
 import PlayerAvatar from "@/components/ui/PlayerAvatar";
 import PlayerRating from "@/components/ui/PlayerRating";
-import { fetchTeams, getTeamFlag } from "@/lib/api";
-import type { Team } from "@/lib/types";
+import TeamCrest from "@/components/ui/TeamCrest";
+import { fetchTeams } from "@/lib/api";
+import type { Player, Team } from "@/lib/types";
 
-function TeamCard({ team }: { team: Team }) {
+const cardVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: Math.min(index * 0.04, 0.3), duration: 0.32 },
+  }),
+};
+
+const playerVariants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: Math.min(index * 0.015, 0.22), duration: 0.22 },
+  }),
+};
+
+function positionGroup(position?: string | null) {
+  const value = (position ?? "").toLowerCase();
+  if (value.includes("goalkeeper")) return "Goalkeepers";
+  if (value.includes("defence") || value.includes("defender")) return "Defenders";
+  if (value.includes("midfield")) return "Midfielders";
+  if (value.includes("offence") || value.includes("forward") || value.includes("winger")) {
+    return "Forwards";
+  }
+  return "Squad";
+}
+
+function groupSquad(players: Player[]) {
+  const order = ["Goalkeepers", "Defenders", "Midfielders", "Forwards", "Squad"];
+  const groups = players.reduce<Record<string, Player[]>>((acc, player) => {
+    const group = positionGroup(player.position);
+    acc[group] = [...(acc[group] ?? []), player];
+    return acc;
+  }, {});
+
+  return order
+    .map((label) => ({ label, players: groups[label] ?? [] }))
+    .filter((group) => group.players.length > 0);
+}
+
+function PlayerRow({ player, index }: { player: Player; index: number }) {
+  return (
+    <motion.div
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-20px" }}
+      variants={playerVariants}
+      whileHover={{ y: -2, scale: 1.01 }}
+      className="group flex items-center gap-3 rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-2 transition-colors hover:border-primary/25 hover:bg-primary/[0.04]"
+    >
+      <PlayerAvatar player={player} size="md" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-white/80 group-hover:text-floodlight">
+          {player.name}
+        </p>
+        <p className="truncate text-[10px] text-white/35">
+          {player.position ?? player.nationality ?? "Player"}
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        {player.shirtNumber && (
+          <span className="hidden rounded-sm bg-goal-net/5 px-2 py-1 font-mono text-[10px] font-bold text-goal-net/45 sm:inline-flex">
+            #{player.shirtNumber}
+          </span>
+        )}
+        <PlayerRating player={player} compact />
+      </div>
+    </motion.div>
+  );
+}
+
+function TeamCard({ team, index }: { team: Team; index: number }) {
   const squad = team.squad ?? [];
+  const groupedSquad = groupSquad(squad);
 
   return (
-    <article className="dashboard-card overflow-hidden">
-      <div className="flex items-start gap-3 border-b border-white/[0.06] bg-surface-elevated/40 p-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/[0.08] bg-pitch text-2xl">
-          {team.crest ? (
-            <img
-              src={team.crest}
-              alt=""
-              className="h-8 w-8 object-contain"
-              loading="lazy"
-            />
-          ) : (
-            <span aria-hidden="true">{getTeamFlag(team.tla)}</span>
-          )}
-        </div>
+    <motion.article
+      custom={index}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      variants={cardVariants}
+      className="dashboard-card overflow-hidden"
+    >
+      <div className="relative flex items-start gap-3 border-b border-white/[0.06] bg-surface-elevated/40 p-4">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary/0 via-primary/60 to-card-gold/0"
+          aria-hidden="true"
+        />
+        <motion.div whileHover={{ rotate: -3, scale: 1.04 }}>
+          <TeamCrest team={team} size="lg" />
+        </motion.div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-xl leading-none" aria-hidden="true">
-              {getTeamFlag(team.tla)}
-            </span>
+            <CountryFlag countryName={team.area?.name || team.name} />
             <h2 className="truncate text-base font-bold text-white">
               {team.name}
             </h2>
@@ -42,15 +120,34 @@ function TeamCard({ team }: { team: Team }) {
             {team.area?.name ? ` | ${team.area.name}` : ""}
           </p>
         </div>
+        <span className="rounded-sm border border-primary/20 bg-primary/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
+          {squad.length ? `${squad.length} players` : "Roster TBA"}
+        </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 p-4 text-xs">
+      <div className="grid grid-cols-2 gap-2 p-4 text-xs md:grid-cols-4">
         <div className="rounded-lg border border-white/[0.06] bg-surface-elevated/40 p-3">
           <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
             Coach
           </p>
           <p className="mt-1 truncate font-semibold text-white/80">
             {team.coach?.name ?? "TBA"}
+          </p>
+        </div>
+        <div className="rounded-lg border border-white/[0.06] bg-surface-elevated/40 p-3">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+            Founded
+          </p>
+          <p className="mt-1 truncate font-mono font-bold text-white/80">
+            {team.founded ?? "TBA"}
+          </p>
+        </div>
+        <div className="rounded-lg border border-white/[0.06] bg-surface-elevated/40 p-3">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-white/30">
+            Venue
+          </p>
+          <p className="mt-1 truncate font-semibold text-white/80">
+            {team.venue ?? "TBA"}
           </p>
         </div>
         <div className="rounded-lg border border-white/[0.06] bg-surface-elevated/40 p-3">
@@ -65,22 +162,26 @@ function TeamCard({ team }: { team: Team }) {
 
       <div className="border-t border-white/[0.05] px-4 pb-4 pt-3">
         {squad.length > 0 ? (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {squad.slice(0, 12).map((player) => (
-              <div
-                key={player.id}
-                className="flex items-center gap-3 rounded-md border border-white/[0.06] bg-white/[0.03] px-3 py-2"
-              >
-                <PlayerAvatar player={player} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-white/75">
-                    {player.name}
-                  </p>
-                  <p className="truncate text-[10px] text-white/30">
-                    {player.position ?? player.nationality ?? "Player"}
-                  </p>
+          <div className="space-y-4">
+            {groupedSquad.map((group) => (
+              <div key={group.label}>
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-primary">
+                    {group.label}
+                  </h3>
+                  <span className="font-mono text-[10px] text-goal-net/35">
+                    {group.players.length}
+                  </span>
                 </div>
-                <PlayerRating player={player} compact />
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {group.players.map((player, playerIndex) => (
+                    <PlayerRow
+                      key={player.id}
+                      player={player}
+                      index={playerIndex}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -90,7 +191,7 @@ function TeamCard({ team }: { team: Team }) {
           </p>
         )}
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -152,8 +253,8 @@ export default function TeamsPage() {
         </div>
       ) : teams.length > 0 ? (
         <div className="space-y-4">
-          {teams.map((team) => (
-            <TeamCard key={team.id} team={team} />
+          {teams.map((team, index) => (
+            <TeamCard key={team.id} team={team} index={index} />
           ))}
         </div>
       ) : (

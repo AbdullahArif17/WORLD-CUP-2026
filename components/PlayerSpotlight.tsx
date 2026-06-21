@@ -1,6 +1,6 @@
 import PlayerAvatar from "@/components/ui/PlayerAvatar";
 import PlayerRating from "@/components/ui/PlayerRating";
-import { getTeamFlag } from "@/lib/api";
+import TeamCrest from "@/components/ui/TeamCrest";
 import type { Scorer } from "@/lib/types";
 
 interface PlayerSpotlightProps {
@@ -51,13 +51,13 @@ export default function PlayerSpotlight({
                 aria-hidden="true"
               />
               <div className="relative flex items-start justify-between gap-3">
-                <PlayerAvatar player={scorer.player} size="lg" />
+                <PlayerAvatar player={scorer.player} size="lg" loadPhoto />
                 <div className="text-right">
                   <span className="font-mono text-xs font-bold text-goal-net/35">
                     #{index + 1}
                   </span>
                   <div className="mt-2">
-                    <PlayerRating player={scorer.player} />
+                    <PlayerRating player={scorer.player} showLabel />
                   </div>
                 </div>
               </div>
@@ -65,7 +65,9 @@ export default function PlayerSpotlight({
                 {scorer.player.name}
               </h3>
               <p className="mt-1 truncate text-xs text-goal-net/40">
-                <span aria-hidden="true">{getTeamFlag(scorer.team.tla)}</span>{" "}
+                <span className="mr-2 inline-flex align-middle">
+                  <TeamCrest team={scorer.team} size="sm" />
+                </span>
                 {scorer.team.shortName || scorer.team.name}
               </p>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">

@@ -270,7 +270,7 @@ export function KeyPlayersPanel({ match }: { match: MatchDetails }) {
               <span className="w-5 font-mono text-xs font-bold text-goal-net/35">
                 {index + 1}
               </span>
-              <PlayerAvatar player={player} size="sm" />
+              <PlayerAvatar player={player} size="sm" loadPhoto={index < 3} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-floodlight">
                   {player.name}
@@ -279,7 +279,7 @@ export function KeyPlayersPanel({ match }: { match: MatchDetails }) {
                   {player.position ?? "Player"}
                 </p>
               </div>
-              <PlayerRating player={player} />
+              <PlayerRating player={player} showLabel />
             </div>
           ))}
         </div>
