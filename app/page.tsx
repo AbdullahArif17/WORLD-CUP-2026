@@ -19,6 +19,7 @@ import {
 } from "@/lib/api";
 import type { Match, Scorer } from "@/lib/types";
 
+
 const REFRESH_INTERVAL = 60_000;
 
 export default function HomePage() {
